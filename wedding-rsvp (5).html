@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedding RSVP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --terra:       #B8623A;
+      --terra-light: #F2E6DC;
+      --terra-dark:  #8C4524;
+      --sage:        #7A8C73;
+      --sage-light:  #E6EDE4;
+      --sage-dark:   #4F6347;
+      --linen:       #F7F2EC;
+      --sand:        #EDE5D8;
+      --stone:       #D4C8B8;
+      --ink:         #26201A;
+      --ink-mid:     #6B5F54;
+      --ink-soft:    #A89D92;
+      --white:       #FDFAF7;
+      --border:      rgba(38,32,26,0.10);
+      --border-md:   rgba(38,32,26,0.18);
+      --font-display:'Libre Baskerville', Georgia, serif;
+      --font-body:   'DM Sans', system-ui, sans-serif;
+      --radius-sm:   6px;
+      --radius-md:   10px;
+      --radius-lg:   14px;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--linen);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 3.5rem 1.25rem 5rem;
+    }
+
+    #app { width: 100%; max-width: 520px; }
+
+    /* ── Header ── */
+    .page-header { text-align: center; margin-bottom: 3rem; }
+    .eyebrow {
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--terra);
+      margin-bottom: 1rem;
+      display: block;
+    }
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 7vw, 2.8rem);
+      font-weight: 400;
+      color: var(--ink);
+      letter-spacing: -.01em;
+      line-height: 1.15;
+    }
+    .tagline {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 1rem;
+      color: var(--ink-mid);
+      margin-top: .65rem;
+      line-height: 1.6;
+    }
+    .rule { width: 32px; height: 1.5px; background: var(--terra); margin: 1.3rem auto 0; }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 1.6rem; }
+    .label {
+      display: block;
+      font-size: .7rem;
+      font-weight: 500;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--ink-mid);
+      margin-bottom: 6px;
+    }
+    .sublabel {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: .88rem;
+      color: var(--ink-soft);
+      margin-bottom: 10px;
+      display: block;
+      line-height: 1.5;
+    }
+    .req { color: var(--terra); }
+    .field-error { color: var(--terra-dark); font-size: .78rem; margin-top: 5px; }
+
+    input[type="text"],
+    input[type="password"],
+    textarea {
+      width: 100%;
+      padding: 11px 15px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: .93rem;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      -webkit-appearance: none;
+    }
+    input:focus, textarea:focus {
+      border-color: var(--terra);
+      box-shadow: 0 0 0 3px rgba(184,98,58,.1);
+    }
+    textarea { resize: vertical; min-height: 90px; line-height: 1.65; }
+    input::placeholder, textarea::placeholder { color: var(--ink-soft); }
+
+    /* ── Choice pills ── */
+    .choice-group { display: flex; gap: 8px; flex-wrap: wrap; }
+    .choice-btn {
+      flex: 1;
+      min-width: 90px;
+      padding: 9px 10px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      text-align: center;
+      cursor: pointer;
+      font-size: .83rem;
+      font-family: var(--font-body);
+      color: var(--ink-mid);
+      background: var(--white);
+      transition: all .17s;
+      user-select: none;
+      line-height: 1.3;
+    }
+    .choice-btn:hover { border-color: var(--terra); background: var(--terra-light); color: var(--terra-dark); }
+    .choice-btn.sel-terra { border-color: var(--terra); background: var(--terra-light); color: var(--terra-dark); font-weight: 500; }
+    .choice-btn.sel-sage  { border-color: var(--sage);  background: var(--sage-light);  color: var(--sage-dark);  font-weight: 500; }
+
+    /* ── Counter ── */
+    .counter-row { display: flex; align-items: center; gap: 14px; }
+    .counter-btn {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      border: 0.5px solid var(--border-md);
+      background: var(--white);
+      font-size: 1.2rem;
+      cursor: pointer; color: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s; flex-shrink: 0;
+    }
+    .counter-btn:hover { background: var(--terra-light); border-color: var(--terra); color: var(--terra-dark); }
+    .counter-val { font-size: 1.1rem; font-weight: 500; min-width: 22px; text-align: center; }
+    .counter-lbl { font-size: .83rem; color: var(--ink-mid); }
+
+    /* ── Buttons ── */
+    .submit-btn {
+      width: 100%;
+      padding: 13px 20px;
+      background: var(--terra);
+      color: var(--white);
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: .88rem;
+      font-weight: 500;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      margin-top: .3rem;
+    }
+    .submit-btn:hover { background: var(--terra-dark); }
+    .submit-btn:active { transform: scale(.99); }
+    .submit-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .sec-btn {
+      padding: 10px 22px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      font-family: var(--font-body);
+      font-size: .82rem; font-weight: 500;
+      letter-spacing: .07em; text-transform: uppercase;
+      color: var(--ink-mid); cursor: pointer;
+      transition: background .15s;
+    }
+    .sec-btn:hover { background: var(--sand); color: var(--ink); }
+
+    /* ── Success ── */
+    .success-wrap { text-align: center; padding: 1rem 0 2rem; }
+    .check-ring {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: 1.5px solid var(--terra);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 1.8rem;
+    }
+    .check-ring svg { width: 24px; height: 24px; stroke: var(--terra); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+    /* ── Admin link ── */
+    .admin-link {
+      text-align: center;
+      margin-top: 2.2rem;
+      font-size: .67rem;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .admin-link:hover { color: var(--ink-mid); }
+
+    .back-btn {
+      display: inline-block;
+      font-size: .7rem; letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink-soft); cursor: pointer;
+      margin-bottom: 2rem;
+    }
+    .back-btn:hover { color: var(--ink-mid); }
+    .err-msg { color: var(--terra-dark); font-size: .82rem; margin-top: 6px; }
+
+    /* ── Admin dashboard ── */
+    .dash-header { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 1.6rem; }
+    .dash-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 400; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 2rem; }
+    .stat-box { background: var(--white); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 1rem .5rem; text-align: center; }
+    .stat-num { font-family: var(--font-display); font-size: 1.8rem; font-weight: 400; line-height: 1; }
+    .stat-lbl { font-size: .65rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); margin-top: 4px; }
+
+    .rsvp-card { background: var(--white); border: 0.5px solid var(--border); border-radius: var(--radius-md); padding: 1.1rem 1.3rem; margin-bottom: .8rem; }
+    .rsvp-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: .5rem; }
+    .guest-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 400; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 3px; font-size: .67rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500; flex-shrink: 0; }
+    .badge-yes   { background: var(--sage-light); color: var(--sage-dark); }
+    .badge-no    { background: var(--terra-light); color: var(--terra-dark); }
+    .badge-maybe { background: var(--sand); color: #7A5C30; }
+    .card-detail { font-size: .82rem; color: var(--ink-mid); margin-bottom: .2rem; }
+    .card-message { margin-top: .7rem; padding: .65rem .9rem; background: var(--linen); border-left: 2px solid var(--stone); font-family: var(--font-display); font-style: italic; font-size: .93rem; color: var(--ink-mid); line-height: 1.55; }
+    .card-ts { font-size: .68rem; color: var(--ink-soft); margin-top: .6rem; }
+    .empty-state { text-align: center; padding: 3.5rem 0; font-family: var(--font-display); font-style: italic; font-size: 1.1rem; color: var(--ink-soft); }
+
+    .export-btn {
+      padding: 7px 16px;
+      border: 0.5px solid var(--border-md);
+      border-radius: var(--radius-sm);
+      background: transparent;
+      font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 500;
+      color: var(--ink-mid); cursor: pointer; transition: background .15s;
+    }
+    .export-btn:hover { background: var(--sand); color: var(--ink); }
+
+    @media (max-width: 600px) {
+      body { padding: 2rem .9rem 4rem; }
+      #app { max-width: 100%; }
+      h1 { font-size: clamp(1.7rem, 8vw, 2.4rem); }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .choice-btn { min-width: 0; font-size: .8rem; padding: 10px 8px; }
+      .rsvp-card { padding: .9rem 1rem; }
+      input[type="text"], input[type="password"], textarea { font-size: 1rem; padding: 12px 14px; }
+      .submit-btn { padding: 15px 20px; font-size: .9rem; }
+      .counter-btn { width: 42px; height: 42px; font-size: 1.3rem; }
+    }
+  </style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const ADMIN_PASSWORD = '10052025';
+const SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE'; // ← paste your deployed Apps Script URL here
+const STORAGE_KEY = 'wedding_rsvp_v3';
+
+// ── Storage ──
+function loadAll()  { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch { return []; } }
+function saveAll(l) { localStorage.setItem(STORAGE_KEY, JSON.stringify(l)); }
+function updateEntry(e){ const l=loadAll(); const i=l.findIndex(r=>r.email===e.email); if(i>=0)l[i]=e; else l.unshift(e); saveAll(l); }
+function getSavedSubmission(email){ try { return JSON.parse(localStorage.getItem(`wedding_rsvp_sub_${email.toLowerCase()}`)||'null'); } catch { return null; } }
+function saveSubmission(e){ localStorage.setItem(`wedding_rsvp_sub_${e.email.toLowerCase()}`, JSON.stringify(e)); }
+
+// ── State ──
+let S = {
+  view: 'email-lookup',
+  lookupEmail: '', lookupLoading: false, lookupError: '',
+  submitting: false, errors: {},
+  form: {email:'', name:'', attending:'', guestCount:1, guestNames:[], dietary:'', message:''},
+  isEditing: false,
+  adminPass:'', adminError:false, responses:[]
+};
+
+const esc   = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const radio = (field,val,label,cls='sel-terra') =>
+  `<div class="choice-btn${S.form[field]===val?' '+cls:''}" data-field="${field}" data-val="${val}">${label}</div>`;
+const validEmail = s => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(s.trim());
+
+// ── Views ──
+function EmailLookupHTML() {
+  return `
+    <header class="page-header">
+      <span class="eyebrow">You are invited</span>
+      <h1>RSVP</h1>
+      <p class="tagline">We would be so honoured to<br>have you celebrate with us.</p>
+      <div class="rule"></div>
+    </header>
+    <div class="field">
+      <label class="label">Your email address <span class="req">*</span></label>
+      <span class="sublabel">We'll use this to look up or save your response.</span>
+      <input id="f-lookup-email" type="email" placeholder="you@example.com"
+        value="${esc(S.lookupEmail)}" autocomplete="email"
+        style="${S.lookupError?'border-color:var(--terra-dark)':''}"/>
+      ${S.lookupError?`<div class="field-error">${S.lookupError}</div>`:''}
+    </div>
+    <button class="submit-btn" id="btn-lookup" ${S.lookupLoading?'disabled':''}>
+      ${S.lookupLoading?'Checking…':'Continue'}
+    </button>
+    <p class="admin-link" id="btn-admin-link">Admin</p>`;
+}
+
+function FormHTML() {
+  const f=S.form, e=S.errors, show=f.attending==='yes';
+  return `
+    <header class="page-header">
+      <span class="eyebrow">${S.isEditing?'Update your response':'You are invited'}</span>
+      <h1>${S.isEditing?'Edit RSVP':'RSVP'}</h1>
+      <p class="tagline">We would be so honoured to<br>have you celebrate with us.</p>
+      <div class="rule"></div>
+    </header>
+
+    <div class="field">
+      <label class="label">Email</label>
+      <input type="email" value="${esc(f.email)}" disabled
+        style="opacity:.55;cursor:not-allowed;background:var(--sand)"/>
+    </div>
+
+    <div class="field">
+      <label class="label">Full name <span class="req">*</span></label>
+      <input id="f-name" type="text" placeholder="Your name" value="${esc(f.name)}" autocomplete="name"/>
+      ${e.name?`<div class="field-error">${e.name}</div>`:''}
+    </div>
+
+    <div class="field">
+      <label class="label">Will you be joining us? <span class="req">*</span></label>
+      <span class="sublabel">We truly hope you can make it — your presence would mean everything to us.</span>
+      <div class="choice-group">
+        ${radio('attending','yes','Joyfully Attending')}
+        ${radio('attending','no','Regretfully Declining')}
+      </div>
+      ${e.attending?`<div class="field-error">${e.attending}</div>`:''}
+    </div>
+
+    ${show?`
+    <div class="field">
+      <label class="label">Seats to reserve</label>
+      <span class="sublabel">Count yourself and anyone joining you.</span>
+      <div class="counter-row">
+        <button class="counter-btn" id="count-dec">−</button>
+        <span class="counter-val">${f.guestCount}</span>
+        <button class="counter-btn" id="count-inc">+</button>
+        <span class="counter-lbl">${f.guestCount===1?'1 guest':`${f.guestCount} guests`}</span>
+      </div>
+    </div>
+    ${f.guestCount>1?`
+    <div class="field">
+      <label class="label">Guest names</label>
+      <span class="sublabel">Please note that only invited guests are permitted to attend.</span>
+      ${Array.from({length:f.guestCount-1},(_,i)=>`
+        <input id="f-guestname-${i}" type="text" placeholder="Guest ${i+2} full name"
+          value="${esc((f.guestNames||[])[i]||'')}" autocomplete="off"
+          style="margin-bottom:${i<f.guestCount-2?'8px':'0'};display:block;width:100%"/>
+      `).join('')}
+    </div>`:''}
+    `:''}
+
+    <div class="field">
+      <label class="label">Dietary needs or allergies</label>
+      <span class="sublabel">We want every bite to be safe and wonderful for you.</span>
+      <input id="f-dietary" type="text" placeholder="e.g. gluten-free, nut allergy, halal…" value="${esc(f.dietary)}"/>
+    </div>
+
+    <div class="field">
+      <label class="label">A note for us</label>
+      <span class="sublabel">Your words would mean the world to us.</span>
+      <textarea id="f-message" placeholder="A message, well-wishes, or a fond memory…">${esc(f.message)}</textarea>
+    </div>
+
+    <button class="submit-btn" id="btn-submit" ${S.submitting?'disabled':''}>
+      ${S.submitting?'Saving…':S.isEditing?'Save Changes':'Send RSVP'}
+    </button>
+    ${S.isEditing?`<p style="text-align:center;margin-top:1rem"><span class="sec-btn" id="btn-cancel-edit">Cancel</span></p>`:''}
+    <p class="admin-link" id="btn-admin-link">Admin</p>`;
+}
+
+function AlreadySubmittedHTML() {
+  const r=getSavedSubmission(S.form.email);
+  if(!r) return FormHTML();
+  const attending=r.attending==='yes'?'Joyfully Attending':'Regretfully Declining';
+  const allNames=r.attending==='yes'&&r.guestCount>1&&r.guestNames&&r.guestNames.filter(Boolean).length
+    ?[r.name,...r.guestNames.filter(Boolean)].map(esc).join(', '):null;
+  const dt=new Date(r.timestamp);
+  const ds=isNaN(dt)?'':dt.toLocaleString('en-SG',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  return `
+    <header class="page-header">
+      <span class="eyebrow">Already responded</span>
+      <h1>You're all set.</h1>
+      <p class="tagline">We've already received your RSVP.<br>See your response below.</p>
+      <div class="rule"></div>
+    </header>
+    <div class="rsvp-card" style="margin-bottom:1.6rem">
+      <div class="rsvp-card-top">
+        <span class="guest-name">${esc(r.name)}</span>
+        <span class="badge ${r.attending==='yes'?'badge-yes':'badge-no'}">${attending}</span>
+      </div>
+      <div class="card-detail" style="font-size:.78rem;color:var(--ink-soft)">${esc(r.email)}</div>
+      ${r.attending==='yes'?`<div class="card-detail">Seats: ${r.guestCount||1}${allNames?` &nbsp;·&nbsp; ${allNames}`:''}</div>`:''}
+      ${r.dietary?`<div class="card-detail">Dietary: ${esc(r.dietary)}</div>`:''}
+      ${r.message?`<div class="card-message">"${esc(r.message)}"</div>`:''}
+      <div class="card-ts">Submitted ${ds}</div>
+    </div>
+    <button class="submit-btn" id="btn-edit-response">Edit my response</button>
+    <p style="text-align:center;margin-top:1rem"><span class="sec-btn" id="btn-not-me">Not me — use a different email</span></p>
+    <p class="admin-link" id="btn-admin-link">Admin</p>`;
+}
+
+function SuccessHTML() {
+  const a=S.form.attending, n=esc(S.form.name), isEdit=S.isEditing;
+  const titles={yes:isEdit?'All updated.':'See you there.',no:isEdit?'Got it.':'Until next time.'};
+  const msgs={yes:isEdit?`Your response has been updated, ${n}.`:`We cannot wait to celebrate with you, ${n}.`,
+              no:isEdit?`We've noted your change, ${n}. We'll miss you.`:`We'll miss you, ${n}. Thank you for letting us know.`};
+  return `
+    <header class="page-header">
+      <span class="eyebrow">Response ${isEdit?'updated':'received'}</span>
+      <h1>${titles[a]||'Thank you.'}</h1>
+      <div class="rule"></div>
+    </header>
+    <div class="success-wrap">
+      <div class="check-ring"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <p style="font-family:var(--font-display);font-style:italic;font-size:1.05rem;color:var(--ink-mid);margin-bottom:2rem;line-height:1.6">${msgs[a]||''}</p>
+    </div>
+    <p class="admin-link" id="btn-admin-link">Admin</p>`;
+}
+
+function AdminLoginHTML() {
+  return `
+    <span class="back-btn" id="btn-back">← Back</span>
+    <div style="max-width:340px">
+      <header style="margin-bottom:2rem">
+        <span class="eyebrow">Couple's view</span>
+        <h1 style="font-size:1.9rem">Admin</h1>
+      </header>
+      <div class="field">
+        <label class="label">Password</label>
+        <input id="f-adminpass" type="password" placeholder="Enter password" value="${esc(S.adminPass)}"/>
+        ${S.adminError?`<div class="err-msg">Incorrect password. Please try again.</div>`:''}
+      </div>
+      <button class="submit-btn" id="btn-login">View Responses</button>
+    </div>`;
+}
+
+function AdminHTML() {
+  const rs=S.responses;
+  const yes=rs.filter(r=>r.attending==='yes').length;
+  const no=rs.filter(r=>r.attending==='no').length;
+  const seats=rs.filter(r=>r.attending==='yes').reduce((s,r)=>s+(r.guestCount||1),0);
+  return `
+    <span class="back-btn" id="btn-back">← Back</span>
+    <div class="dash-header">
+      <h2 class="dash-title">Responses <span style="font-size:1rem;color:var(--ink-soft)">(${rs.length})</span></h2>
+      <button class="export-btn" id="btn-export">Export CSV</button>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-num">${yes}</div><div class="stat-lbl">Attending</div></div>
+      <div class="stat-box"><div class="stat-num">${no}</div><div class="stat-lbl">Declined</div></div>
+      <div class="stat-box"><div class="stat-num">${seats}</div><div class="stat-lbl">Seats</div></div>
+    </div>
+    ${rs.length===0?`<div class="empty-state">No responses yet.</div>`
+    :rs.map(r=>{
+      const bc=r.attending==='yes'?'badge-yes':'badge-no';
+      const bl=r.attending==='yes'?'Attending':'Declined';
+      const dt=new Date(r.timestamp);
+      const ds=isNaN(dt)?'':dt.toLocaleString('en-SG',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      return `<div class="rsvp-card">
+        <div class="rsvp-card-top"><span class="guest-name">${esc(r.name)}</span><span class="badge ${bc}">${bl}${r.edited?' · Edited':''}</span></div>
+        <div class="card-detail" style="font-size:.78rem;color:var(--ink-soft)">${esc(r.email||'')}</div>
+        ${r.attending!=='no'?`<div class="card-detail">Seats: ${r.guestCount||1}${(r.guestNames&&r.guestNames.filter(Boolean).length)?` &nbsp;·&nbsp; ${[r.name,...r.guestNames.filter(Boolean)].map(esc).join(', ')}`:''}</div>`:''}
+        ${r.dietary?`<div class="card-detail">Dietary: ${esc(r.dietary)}</div>`:''}
+        ${r.message?`<div class="card-message">"${esc(r.message)}"</div>`:''}
+        <div class="card-ts">${ds}</div>
+      </div>`;
+    }).join('')}`;
+}
+
+// ── Render ──
+function render() {
+  const app=document.getElementById('app');
+  if     (S.view==='email-lookup')      app.innerHTML=EmailLookupHTML();
+  else if(S.view==='form')              app.innerHTML=FormHTML();
+  else if(S.view==='already-submitted') app.innerHTML=AlreadySubmittedHTML();
+  else if(S.view==='success')           app.innerHTML=SuccessHTML();
+  else if(S.view==='admin-login')       app.innerHTML=AdminLoginHTML();
+  else if(S.view==='admin')             app.innerHTML=AdminHTML();
+
+  bind('f-lookup-email','input',v=>{S.lookupEmail=v; S.lookupError='';});
+  bind('f-lookup-email','keydown',null,e=>{if(e.key==='Enter')doLookup();});
+  bind('btn-lookup','click',null,doLookup);
+  bind('f-name','input',v=>setF('name',v));
+  for(let i=0;i<S.form.guestCount-1;i++){
+    (idx=>bind(`f-guestname-${idx}`,'input',v=>{
+      const names=[...(S.form.guestNames||[])]; names[idx]=v; S.form.guestNames=names;
+    }))(i);
+  }
+  bind('f-dietary','input',v=>setF('dietary',v));
+  bind('f-message','input',v=>setF('message',v));
+  bind('f-adminpass','input',v=>{S.adminPass=v;S.adminError=false;});
+  bind('f-adminpass','keydown',null,e=>{if(e.key==='Enter')doLogin();});
+  bind('count-dec','click',null,()=>{if(S.form.guestCount>1){S.form.guestCount--;S.form.guestNames=(S.form.guestNames||[]).slice(0,S.form.guestCount-1);render();}});
+  bind('count-inc','click',null,()=>{S.form.guestCount++;render();});
+  bind('btn-submit','click',null,doSubmit);
+  bind('btn-edit-response','click',null,startEdit);
+  bind('btn-cancel-edit','click',null,cancelEdit);
+  bind('btn-not-me','click',null,()=>set({view:'email-lookup', lookupEmail:'', lookupError:''}));
+  bind('btn-admin-link','click',null,()=>set({view:'admin-login'}));
+  bind('btn-back','click',null,()=>set({view:'email-lookup', isEditing:false}));
+  bind('btn-login','click',null,doLogin);
+  bind('btn-export','click',null,exportCSV);
+  document.querySelectorAll('.choice-btn').forEach(b=>b.addEventListener('click',()=>{
+    S.form[b.dataset.field]=b.dataset.val;
+    if(S.errors[b.dataset.field])S.errors[b.dataset.field]=undefined;
+    render();
+  }));
+}
+
+function bind(id,ev,inputCb,directCb){
+  const el=document.getElementById(id);if(!el)return;
+  if(inputCb)  el.addEventListener(ev,e=>inputCb(e.target.value));
+  if(directCb) el.addEventListener(ev,directCb);
+}
+function setF(k,v){S.form[k]=v;if(S.errors[k])S.errors[k]=undefined;}
+function set(patch){Object.assign(S,patch);render();}
+
+// ── Email lookup: check localStorage first, then Google Sheets (cross-device) ──
+async function doLookup(){
+  const email=S.lookupEmail.trim();
+  if(!validEmail(email)){ S.lookupError='Please enter a valid email address.'; render(); return; }
+  S.lookupLoading=true; S.lookupError=''; render();
+
+  // 1. Check localStorage cache first (instant)
+  const cached=getSavedSubmission(email);
+  if(cached){
+    S.form={...cached}; S.lookupLoading=false;
+    set({view:'already-submitted'}); return;
+  }
+
+  // 2. Check Google Sheets (catches submissions from other devices)
+  if(SCRIPT_URL&&SCRIPT_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
+    try{
+      const res=await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email.toLowerCase())}`);
+      const data=await res.json();
+      if(data.found&&data.response){
+        saveSubmission(data.response); // cache locally for next time
+        S.form={...data.response};
+        S.lookupLoading=false; set({view:'already-submitted'}); return;
+      }
+    }catch(err){ console.warn('Sheet lookup failed, proceeding as new guest:', err); }
+  }
+
+  // 3. No prior response found — open form
+  S.form={email:email, name:'', attending:'', guestCount:1, guestNames:[], dietary:'', message:''};
+  S.lookupLoading=false; set({view:'form'});
+}
+
+function startEdit(){
+  const r=getSavedSubmission(S.form.email); if(!r)return;
+  S.form={...r}; S.isEditing=true; S.errors={}; S.view='form'; render();
+}
+function cancelEdit(){ S.isEditing=false; S.errors={}; S.view='already-submitted'; render(); }
+
+async function doSubmit(){
+  const f=S.form, errs={};
+  if(!f.name.trim())  errs.name='Please enter your name.';
+  if(!f.attending)    errs.attending='Please let us know if you can attend.';
+  if(Object.keys(errs).length){set({errors:errs});return;}
+  set({submitting:true});
+  const entry={...f, timestamp:new Date().toISOString(), edited:S.isEditing||undefined};
+  updateEntry(entry);
+  saveSubmission(entry);
+  if(SCRIPT_URL&&SCRIPT_URL!=='YOUR_APPS_SCRIPT_URL_HERE'){
+    try{
+      const fd=new URLSearchParams();
+      fd.append('data',JSON.stringify({...entry,isEdit:S.isEditing}));
+      await fetch(SCRIPT_URL,{method:'POST',body:fd,mode:'no-cors'});
+    }catch(err){console.error('Sheet sync failed:',err);}
+  }
+  S.isEditing=false;
+  set({submitting:false,view:'success'});
+}
+
+function doLogin(){
+  if(S.adminPass===ADMIN_PASSWORD){S.responses=loadAll();set({view:'admin',adminError:false});}
+  else set({adminError:true});
+}
+
+function exportCSV(){
+  const rs=S.responses; if(!rs.length)return;
+  const hdr=['Email','Name','Attending','Seats','Guest Names','Dietary Needs','Message','Edited','Submitted At'];
+  const rows=rs.map(r=>[
+    r.email||'', r.name, r.attending, r.guestCount||1,
+    (r.guestNames&&r.guestNames.filter(Boolean).length)?[r.name,...r.guestNames.filter(Boolean)].join('; '):r.name,
+    r.dietary||'', r.message||'', r.edited?'Yes':'No',
+    r.timestamp?new Date(r.timestamp).toLocaleString('en-SG'):''
+  ].map(v=>`"${String(v).replace(/"/g,'""')}"`));
+  const csv=[hdr.join(','),...rows.map(r=>r.join(','))].join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='wedding-rsvp.csv'; a.click();
+}
+
+render();
+</script>
+</body>
+</html>
